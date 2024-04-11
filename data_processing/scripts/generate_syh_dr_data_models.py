@@ -128,7 +128,7 @@ def process_csv_files(pdf_url, csv_folder):
                             f"{column_name}::{data_type} AS {column_name}"
                         )
                 else:
-                    column_list.append(f"{column_name}::VARCHAR")
+                    column_list.append(f"{column_name}::VARCHAR AS {column_name}")
 
             if csv_types:
                 open_bracket = "{"
