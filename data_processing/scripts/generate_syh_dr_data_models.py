@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 import tempfile
 import pdfplumber
+import re
 
 
 def process_csv_files(pdf_url, csv_folder):
@@ -78,6 +79,10 @@ def process_csv_files(pdf_url, csv_folder):
             elif "AMT" in column_name:
                 data_type = "FLOAT"
 
+            # Remove last character if the  last character is numerical 
+            column_name_ex_digit = re.sub(r'(?<=_)\d+$', '', column_name)
+
+
             for page_number in range(10, len(pdf.pages)):
                 print(f"Searching for column '{column_name}' on page {page_number + 1}")
                 page = pdf.pages[page_number]
@@ -87,9 +92,9 @@ def process_csv_files(pdf_url, csv_folder):
                 text = cropped_page.extract_text()
                 lines = text.split("\n")
 
-                if column_name in text:
+                if column_name_ex_digit in text:
                     print(f"Column '{column_name}' found on page {page_number + 1}")
-
+                    # TODO - Get the 
                     # Extract the first occurrence of "Character" or "Numeric" before the table start
                     if data_type is None:
                         if "Character" in lines:
@@ -128,7 +133,7 @@ def process_csv_files(pdf_url, csv_folder):
                             f"{column_name}::{data_type} AS {column_name}"
                         )
                 else:
-                    column_list.append(f"{column_name}::VARCHAR AS {column_name}")
+                    column_list.append(f"{column_name}::VARCHAR")
 
             if csv_types:
                 open_bracket = "{"
